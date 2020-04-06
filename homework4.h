@@ -11,6 +11,7 @@
 // This function initializes the board by turning off the Watchdog Timer.
 void initBoard();
 bool charFSM(char rChar);
+unsigned int myStringLength(char *str);
 
 // TODO: Define any constants that are local to homework.c using #define
 
