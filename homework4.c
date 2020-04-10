@@ -7,6 +7,10 @@ int main(void)
     char rChar;
     char *response = "\n\n\r2534 is the best course in the curriculum!\r\n\n";
 
+    // Calculate the string length of the response
+    int length;
+    length = myStringLength(response);
+
 
     // TODO: Declare the variables that main uses to interact with your state machine.
 
@@ -81,8 +85,9 @@ int main(void)
                             }
 
                     }
+                    //Reset the position of the response string.
                     int i=0;
-                    for (i=0; i<48;i++){
+                    for (i=0; i<length;i++){
                         response--;
                     }
 
