@@ -3,17 +3,14 @@
 #include <stdbool.h>
 
 int main(void)
-{
+ {
     char rChar;
     char *response = "\n\n\r2534 is the best course in the curriculum!\r\n\n";
-    int length;
-    length = myStringLength(response);
+
 
     // TODO: Declare the variables that main uses to interact with your state machine.
 
-
     bool isFinished = false;
-
 
     // Stops the Watchdog timer.
     initBoard();
@@ -56,14 +53,11 @@ int main(void)
         // TODO: Check the receive interrupt flag to see if a received character is available.
         //       Return 0xFF if no character is available.
 
-
         if (UART_getInterruptStatus (EUSCI_A0_BASE, EUSCI_A_UART_RECEIVE_INTERRUPT_FLAG) != EUSCI_A_UART_RECEIVE_INTERRUPT_FLAG){
 
             rChar = 0xFF;
 
        }
-
-
 
         // TODO: If an actual character was received, echo the character to the terminal AND use it to update the FSM.
         //       Check the transmit interrupt flag prior to transmitting the character.
@@ -74,29 +68,31 @@ int main(void)
 
             if (UART_getInterruptStatus (EUSCI_A0_BASE, EUSCI_A_UART_TRANSMIT_INTERRUPT_FLAG) == EUSCI_A_UART_TRANSMIT_INTERRUPT_FLAG){
                 UART_transmitData(EUSCI_A0_BASE, rChar);
-            }
 
-            bool isFinished = charFSM(rChar);
+                isFinished = charFSM(rChar);
 
-            if(isFinished){
+                if(isFinished){
+                    isFinished = false;
 
+                        while (*response != 0){
+                            if (UART_getInterruptStatus (EUSCI_A0_BASE, EUSCI_A_UART_TRANSMIT_INTERRUPT_FLAG) == EUSCI_A_UART_TRANSMIT_INTERRUPT_FLAG){
+                            UART_transmitData(EUSCI_A0_BASE, *response);
+                            response++;
+                            }
 
-                int i = 0;
-                for(i = 0; i <= length; i++){
-                    while (*response != 0){
-                        UART_transmitData(EUSCI_A0_BASE, *response);
-                        response++;
                     }
+                    int i=0;
+                    for (i=0; i<48;i++){
+                        response--;
+                    }
+
                 }
-                isFinished = false;
             }
+
         }
-
-
         // TODO: If the FSM indicates a successful string entry, transmit the response string.
         //       Check the transmit interrupt flag prior to transmitting each character and moving on to the next one.
         //       Make sure to reset the success variable after transmission.
-
 
     }
 }
@@ -125,11 +121,19 @@ bool charFSM(char rChar)
         case E1:
                if (rChar == '5')
                    currentState = E2;
+               else if (rChar == '2')
+                   currentState = E1;
+               else
+                  currentState = E0;
                break;
 
         case E2:
                if (rChar == '3')
                    currentState = E3;
+               else if (rChar == '2')
+                   currentState = E1;
+               else
+                   currentState = E0;
                break;
 
         case E3:
@@ -137,6 +141,10 @@ bool charFSM(char rChar)
                    currentState = E0;
                    finished = true;
                }
+               else if (rChar == '2')
+                  currentState = E1;
+               else
+                   currentState = E0;
                break;
 
        }
